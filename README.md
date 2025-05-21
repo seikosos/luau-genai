@@ -30,23 +30,10 @@ A developer-friendly Lua interface for working with various generative AI provid
 
 - Anything OpenAI compatible e.g. **Perplexity, Together AI, etc.** by prefixing endpoint with openai and double colon e.g. `"openai::https://api.perplexity.ai/chat/completions"`
 
-### Roadmap
-
-- [ ] Audio models
-
-- [ ] Image models
-
-- [ ] Video models
-
 ## Installation
 
-`luarocks install lua-genai`
+just put it somewhere idk
 
-### Dependencies
-
-- [lua-cjson](https://github.com/openresty/lua-cjson)
-- [luasec](https://github.com/brunoos/luasec)
-- [copas](https://github.com/lunarmodules/copas)
 
 ## Usage
 
