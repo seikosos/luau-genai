@@ -3,16 +3,6 @@ local cjson = game:GetService("HttpService")
 ---@module "genai.utils"
 local utils = {}
 
----Decides to either call https request via non-blocking copas or blocking ssl
----@param opts table
----@return number response
----@return number status
----@return table headers
-local function _exec_request(opts)
-	local ret = getgenv().request(opts)
-	return "", ret.StatusCode, ret.Headers
-end
-
 ---Https request with partial response functionality via callback as well as non-blocking via copas
 ---@param url string
 ---@param payload table?
