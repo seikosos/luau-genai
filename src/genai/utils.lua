@@ -1,7 +1,4 @@
-local cjson = require("cjson")
-local copas = require("copas")
-local ssl_https = require("ssl.https")
-local ltn12 = require("ltn12")
+local cjson = game:GetService("HttpService")
 
 ---@module "genai.utils"
 local utils = {}
@@ -11,9 +8,9 @@ local utils = {}
 ---@return number response
 ---@return number status
 ---@return table headers
-local function _exec_request(opts, async)
-	if async then return copas.http.request(opts) end
-	return ssl_https.request(opts)
+local function _exec_request(opts)
+	local ret = getgenv().request(opts)
+	return "", ret.StatusCode, ret.Headers
 end
 
 ---Https request with partial response functionality via callback as well as non-blocking via copas
@@ -24,42 +21,51 @@ end
 ---@param callback function?
 ---@param exception_handler function?
 ---@return string|table body
-function utils.send_request(url, payload, method, headers, callback, exception_handler, async)
-	local response_body = {}
-	local final_sink = ltn12.sink.table(response_body)
+function utils.send_request(url, payload, method, headers, callback, exception_handler)
+    local req = {
+        Url = url,
+        Method = method or "GET",
+        Headers = headers or {},
+        Body = payload
+    }
 
-	---Trigger streamed response parsing
-	---@param chunk string
-	---@return string chunk
-	local function stream_filter(chunk)
-		if chunk and callback then callback(chunk) end
-		return chunk
-	end
+    if payload then
+        req.Headers["Content-Length"] = tostring(#payload)
+    end
 
-	if payload then headers["Content-Length"] = #payload end
+    local success, response = pcall(getgenv().request, req)
+    if not success then
+        if exception_handler then
+            return exception_handler(nil, 0)
+        else
+            error("Request failed: " .. tostring(response))
+        end
+    end
 
-	local request_opts = {
-		url = url,
-		method = method,
-		headers = headers,
-		sink = callback and ltn12.sink.chain(stream_filter, final_sink) or final_sink,
-		source = payload and ltn12.source.string(payload) or nil,
-	}
+    local body = response.Body or ""
+    local status_code = response.StatusCode or 0
+    local content_type = response.Headers and response.Headers["Content-Type"] or ""
 
-	local _, status_code, response_headers = _exec_request(request_opts, async)
-	local body = table.concat(response_body)
+    if callback then
+        callback(body)
+    end
 
-	-- decode body if json response
-	if response_headers["content-type"]:find("application/json") then body = cjson.decode(body) end
+    if content_type:find("application/json") then
+        local success, parsed = pcall(function() return game:GetService("HttpService"):JSONDecode(body) end)
+        if success then
+            body = parsed
+        else
+            warn("Failed to decode JSON response.")
+        end
+    end
 
-	-- handle status codes
-	if exception_handler then
-		exception_handler(body, status_code)
-	else
-		assert(status_code == 200, body)
-	end
+    if exception_handler then
+        exception_handler(body, status_code)
+    else
+        assert(status_code == 200, body)
+    end
 
-	return body
+    return body
 end
 
 ---Storage for full stream response
@@ -71,7 +77,7 @@ Accumulator.__index = Accumulator
 ---@param schema string Encoded provider specific schema table
 function Accumulator.new(schema)
 	local self = setmetatable({}, Accumulator)
-	self.schema = cjson.decode(schema)
+	self.schema = cjson:JSONDecode(schema)
 	return self
 end
 
@@ -100,7 +106,7 @@ function utils.create_sse_callback(opts)
 
 			local json_str = line:match(pattern)
 			if json_str then
-				local ok, obj = pcall(cjson.decode, json_str)
+				local ok, obj = pcall(function() return game:GetService("HttpService"):JSONDecode(json_str) end)
 				if ok and obj then handler(obj) end
 			end
 		end

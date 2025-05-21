@@ -1,3 +1,15 @@
+# ❗❗❗❗❗❗
+# THIS IS NOT THE ORIGINAL REPO
+# VISIT THIS FOR THE ORIGINAL
+# https://github.com/emilrueh/lua-genai
+
+# this is just recoded to work on basicly all exploits
+
+
+
+
+
+
 # Generative AI SDK for Lua
 
 A developer-friendly Lua interface for working with various generative AI providers, abstracting away provider-specific payload structures and response parsing so that using multiple models is easy.

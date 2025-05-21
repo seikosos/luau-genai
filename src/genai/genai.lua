@@ -1,4 +1,4 @@
-local cjson = require("cjson")
+local cjson = game:GetService("HttpService")
 local utils = require("genai.utils")
 local providers = require("genai.providers")
 local features = require("genai.features")
@@ -53,7 +53,7 @@ function GenAI:_setup_stream(processor)
 	local callback = nil
 
 	if processor then
-		accumulator = utils.Accumulator.new(cjson.encode(self.provider.response_schema))
+		accumulator = utils.Accumulator.new(cjson:JSONDecode(self.provider.response_schema))
 		local handler = self.provider.create_stream_handler(accumulator, processor)
 		callback = utils.create_sse_callback({ self.provider.stream_pattern, handler })
 	end
@@ -86,17 +86,16 @@ function GenAI:call(opts)
 
 	local response = utils.send_request(
 		self._endpoint,
-		cjson.encode(payload),
+		cjson:JSONEncode(payload),
 		"POST",
 		headers,
 		callback,
-		self.provider.handle_exceptions,
-		async
+		self.provider.handle_exceptions
 	)
 
 	local reply, input_tokens, output_tokens =
 		self.provider.extract_response_data(accumulator and accumulator.schema or response)
-	reply = type(reply) == "table" and cjson.encode(reply) or reply -- ensure json output is string
+	reply = type(reply) == "table" and cjson:JSONEncode(reply) or reply -- ensure json output is string
 
 	return reply, input_tokens, output_tokens
 end
