@@ -351,4 +351,105 @@ openai.pricing = {
 	},
 }
 
-getgenv().genai = genai
+local GenAI = {}
+GenAI.__index = GenAI
+
+---@param api_key? string
+---@param endpoint string
+function GenAI.new(api_key, endpoint)
+	local self = setmetatable({}, GenAI)
+	self._api_key = api_key
+	self._endpoint = endpoint
+	self.provider = self:_determine_provider({["openai"]=genai.openai})
+	return self
+end
+
+---Check endpoint for occurance of ai provider name
+---@param providers table Collection of GenAI provider modules
+---@return table? provider_module Collection of functions determining input and output structure
+function GenAI:_determine_provider(providers)
+	local provider = nil
+	local endpoint = self._endpoint
+	for provider_name, provider_module in pairs(providers) do
+		if endpoint:find(provider_name) then provider = provider_module end
+	end
+	assert(provider, "GenAI provider could not be determined from provided endpoint")
+	self._endpoint = self:check_if_openai_compatible(endpoint)
+	return provider
+end
+
+---Check if the endpoint starts with 'openai::' for API compatibility
+---@param endpoint string
+---@return string endpoint
+function GenAI:check_if_openai_compatible(endpoint)
+	local prefix, url = endpoint:match("^(.-)::(.+)$")
+	return (prefix == "openai") and url or endpoint
+end
+
+---Prepare streaming requirements if set to stream
+---@param processor function? Display of streamed text chunks
+---@return table? accumulator Schema storing full streamed response
+---@return function? callback Streaming handler
+function GenAI:_setup_stream(processor)
+	local accumulator = nil
+	local callback = nil
+
+	if processor then
+		accumulator = utils.Accumulator.new(cjson:JSONDecode(self.provider.response_schema))
+		local handler = self.provider.create_stream_handler(accumulator, processor)
+		callback = utils.create_sse_callback({ self.provider.stream_pattern, handler })
+	end
+
+	return accumulator, callback
+end
+
+---Prepare API call payload and streaming options
+---@param opts table Payload including model settings and chat history
+---@return table headers
+---@return table payload
+---@return function? callback Streaming handler
+---@return table? accumulator Schema storing full streamed response
+---@return boolean async Whether to use non-blocking https via copas
+function GenAI:_prepare_response_requirements(opts)
+	local headers = self.provider.construct_headers(self._api_key)
+	local payload = self.provider.construct_payload(opts)
+	local accumulator, callback = self:_setup_stream(opts.settings.stream)
+	local async = opts.settings and opts.settings.async or false
+	return headers, payload, callback, accumulator, async
+end
+
+---Execute API call to specified GenAI model with all payload and settings
+---@param opts table Payload including model settings and chat history
+---@return string reply
+---@return number input_tokens
+---@return number output_tokens
+function GenAI:call(opts)
+	local headers, payload, callback, accumulator, async = self:_prepare_response_requirements(opts)
+
+	local response = utils.send_request(
+		self._endpoint,
+		cjson:JSONEncode(payload),
+		"POST",
+		headers,
+		callback,
+		self.provider.handle_exceptions
+	)
+
+	local reply, input_tokens, output_tokens =
+		self.provider.extract_response_data(accumulator and accumulator.schema or response)
+	reply = type(reply) == "table" and cjson:JSONEncode(reply) or reply -- ensure json output is string
+
+	return reply, input_tokens, output_tokens
+end
+
+-- features:
+
+---Create chat instance with automatic tracking of messages and tokens
+---@param model string
+---@param opts table? Containing **settings** and or **system_prompt**
+---@return Chat
+function GenAI:chat(model, opts)
+	return genai.Chat(self, model, opts)
+end
+
+getgenv().genai = GenAI
