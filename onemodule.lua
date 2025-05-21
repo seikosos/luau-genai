@@ -72,7 +72,7 @@ Accumulator.__index = Accumulator
 ---@param schema string Encoded provider specific schema table
 function Accumulator.new(schema)
 	local self = setmetatable({}, Accumulator)
-	self.schema = cjson:JSONDecode(schema)
+	self.schema = type(schema) == "string" and cjson:JSONDecode(schema) or schema
 	return self
 end
 
@@ -449,7 +449,7 @@ end
 ---@param opts table? Containing **settings** and or **system_prompt**
 ---@return Chat
 function GenAI:chat(model, opts)
-	return genai.Chat(self, model, opts)
+	return genai.Chat.new(self, model, opts)
 end
 
 getgenv().genai = GenAI
