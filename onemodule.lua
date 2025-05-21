@@ -350,3 +350,5 @@ openai.pricing = {
 		output = 15,
 	},
 }
+
+getgenv().genai = genai
