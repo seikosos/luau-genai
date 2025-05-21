@@ -18,11 +18,9 @@ A developer-friendly Lua interface for working with various generative AI provid
 
 ## Features
 
-- Stream output for real-time responses
 - Structured JSON response abstraction layer
 - Token usage tracking with cost calculation
 - Open-source models via OpenAI compatibility
-- Async non-blocking requests via copas
 
 ### Providers
 
@@ -70,33 +68,6 @@ local chat = client:chat("gpt-4o-mini", { system_prompt = "You are a fish." })
 print(chat:say("What are you?"))
 ```
 
-### Streaming
-
-```lua
-local process_stream = function(text)
-	io.write(text)
-	io.flush()
-end
-
-local chat = client:chat("gpt-4o-mini", { settings = { stream = process_stream } })
-chat:say("Tell me a very short story.")
-print()
-```
-
-### Async
-
-```lua
-local copas = require("copas")
-
-local chat = client:chat("gpt-4o-mini", { settings = { async = true } })
-
-copas.addthread(function()
-	print(chat:say("test"))
-end)
-
-copas.loop()
-```
-
 ### JSON Response
 
 ```lua
@@ -116,4 +87,5 @@ local chat = client:chat("gpt-4o-mini", { settings = { json = json_object } })
 print(chat:say("Create a powerful wizard called Torben."))
 ```
 
-See `example.lua` for a full-featured Anthropic implementation.
+See `example.lua` for a small example
+See `onemodule.lua` for this as one big module
