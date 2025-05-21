@@ -354,5 +354,5 @@ openai.pricing = {
 -- use as normal
 local client = genai.new("<YOUR_API_KEY>", "https://generativelanguage.googleapis.com/v1beta/openai/")
 
-local chat = client:chat("meta-llama/Meta-Llama-3.1-8B-Instruct", { system_prompt = "" })
+local chat = client:chat("gemini-1.5-flash", { system_prompt = "" })
 print(chat:say("Hello, world!"))
