@@ -30,12 +30,7 @@ function utils.send_request(url, payload, method, headers, callback, exception_h
 
     local success, response = pcall(getgenv().request, req)
     if not success then
-        if exception_handler then
-			warn(tostring(response))
-            return exception_handler(response, response.StatusCode)
-        else
-            error("Request failed: " .. tostring(response))
-        end
+        error("Request failed: " .. tostring(response))
     end
 
     local body = response.Body or ""
@@ -316,7 +311,7 @@ end
 ---@param status_code number
 function openai.handle_exceptions(response, status_code)
 	if status_code >= 300 then
-		warn(response)
+		warn(response, status_code)
 		local err_msg = string.format("%d %s: %s", status_code, response.error.type, response.error.message)
 		error(err_msg)
 	end
