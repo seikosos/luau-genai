@@ -316,6 +316,7 @@ end
 ---@param status_code number
 function openai.handle_exceptions(response, status_code)
 	if status_code >= 300 then
+		warn(response)
 		local err_msg = string.format("%d %s: %s", status_code, response.error.type, response.error.message)
 		error(err_msg)
 	end
