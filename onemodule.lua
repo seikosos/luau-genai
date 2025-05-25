@@ -31,6 +31,7 @@ function utils.send_request(url, payload, method, headers, callback, exception_h
     local success, response = pcall(getgenv().request, req)
     if not success then
         if exception_handler then
+			warn(response)
             return exception_handler(response, response.StatusCode)
         else
             error("Request failed: " .. tostring(response))
