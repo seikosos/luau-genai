@@ -31,7 +31,7 @@ function utils.send_request(url, payload, method, headers, callback, exception_h
     local success, response = pcall(getgenv().request, req)
     if not success then
         if exception_handler then
-            return exception_handler(nil, 0)
+            return exception_handler(cjson:JSONDecode(req.Body), req.StatusCode)
         else
             error("Request failed: " .. tostring(response))
         end
