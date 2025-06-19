@@ -4,7 +4,7 @@
 # https://github.com/emilrueh/lua-genai
 
 # this is just recoded to work on basicly all exploits
-
+# STREAMING RESPONSES WAS REMOVED OUT OF THIS BY ME
 
 
 
