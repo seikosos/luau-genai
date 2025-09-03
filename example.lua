@@ -1,3 +1,5 @@
+-- example if you wanna require it for some reason
+
 local genai = require("genai")
 
 local client = genai.new("<YOUR_API_KEY>", "https://generativelanguage.googleapis.com/v1beta/openai/")
