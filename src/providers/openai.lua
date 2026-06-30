@@ -83,6 +83,7 @@ end
 ---@return number input_tokens
 ---@return number output_tokens
 function openai.extract_response_data(response)
+	if not response then return nil, nil, nil end
 	local reply = response.choices[1].message.content
 	local input_tokens = response.usage.prompt_tokens
 	local output_tokens = response.usage.completion_tokens

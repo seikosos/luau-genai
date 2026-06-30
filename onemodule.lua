@@ -448,6 +448,7 @@ end
 ---@return number input_tokens
 ---@return number output_tokens
 function openai.extract_response_data(response)
+	if not response then return nil, nil, nil end
 	local reply = response.choices[1].message.content
 	local input_tokens = response.usage.prompt_tokens
 	local output_tokens = response.usage.completion_tokens
@@ -685,13 +686,6 @@ local ObjectTree = {
         },
         {
             {
-                4,
-                2,
-                {
-                    "genai"
-                }
-            },
-            {
                 2,
                 2,
                 {
@@ -708,10 +702,10 @@ local ObjectTree = {
                 }
             },
             {
-                8,
+                4,
                 2,
                 {
-                    "utils"
+                    "genai"
                 }
             },
             {
@@ -736,6 +730,13 @@ local ObjectTree = {
                         }
                     }
                 }
+            },
+            {
+                8,
+                2,
+                {
+                    "utils"
+                }
             }
         }
     }
@@ -750,7 +751,7 @@ local LineOffsets = {
     190,
     199,
     366,
-    549
+    550
 }
 
 -- Misc AOT variable imports
