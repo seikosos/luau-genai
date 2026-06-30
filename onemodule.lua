@@ -18,7 +18,7 @@ features.Chat = require("./chat")
 return features
 
 end)() end,
-    function()local wax,script,require=ImportGlobals(3)local ImportGlobals return (function(...)local utils = require("../../utils")
+    function()local wax,script,require=ImportGlobals(3)local ImportGlobals return (function(...)local utils = require("/utils")
 
 ---@class Chat Accumulating chat history and usage
 ---@field client table
@@ -693,24 +693,17 @@ local ObjectTree = {
                 }
             },
             {
-                5,
+                2,
                 2,
                 {
-                    "providers"
+                    "features"
                 },
                 {
                     {
-                        6,
+                        3,
                         2,
                         {
-                            "anthropic"
-                        }
-                    },
-                    {
-                        7,
-                        2,
-                        {
-                            "openai"
+                            "chat"
                         }
                     }
                 }
@@ -723,17 +716,24 @@ local ObjectTree = {
                 }
             },
             {
-                2,
+                5,
                 2,
                 {
-                    "features"
+                    "providers"
                 },
                 {
                     {
-                        3,
+                        7,
                         2,
                         {
-                            "chat"
+                            "openai"
+                        }
+                    },
+                    {
+                        6,
+                        2,
+                        {
+                            "anthropic"
                         }
                     }
                 }
