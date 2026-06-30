@@ -686,13 +686,6 @@ local ObjectTree = {
         },
         {
             {
-                8,
-                2,
-                {
-                    "utils"
-                }
-            },
-            {
                 2,
                 2,
                 {
@@ -736,6 +729,13 @@ local ObjectTree = {
                             "anthropic"
                         }
                     }
+                }
+            },
+            {
+                8,
+                2,
+                {
+                    "utils"
                 }
             }
         }
