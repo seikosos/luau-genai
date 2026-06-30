@@ -18,7 +18,7 @@ features.Chat = require("./chat")
 return features
 
 end)() end,
-    function()local wax,script,require=ImportGlobals(3)local ImportGlobals return (function(...)local utils = require("/utils")
+    function()local wax,script,require=ImportGlobals(3)local ImportGlobals return (function(...)local utils = require(script.Parent.Parent.utils)
 
 ---@class Chat Accumulating chat history and usage
 ---@field client table
@@ -686,19 +686,10 @@ local ObjectTree = {
         },
         {
             {
-                2,
+                8,
                 2,
                 {
-                    "features"
-                },
-                {
-                    {
-                        3,
-                        2,
-                        {
-                            "chat"
-                        }
-                    }
+                    "utils"
                 }
             },
             {
@@ -716,26 +707,35 @@ local ObjectTree = {
                 },
                 {
                     {
-                        7,
-                        2,
-                        {
-                            "openai"
-                        }
-                    },
-                    {
                         6,
                         2,
                         {
                             "anthropic"
                         }
+                    },
+                    {
+                        7,
+                        2,
+                        {
+                            "openai"
+                        }
                     }
                 }
             },
             {
-                8,
+                2,
                 2,
                 {
-                    "utils"
+                    "features"
+                },
+                {
+                    {
+                        3,
+                        2,
+                        {
+                            "chat"
+                        }
+                    }
                 }
             }
         }

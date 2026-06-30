@@ -1,4 +1,4 @@
-local utils = require("/utils")
+local utils = require(script.Parent.Parent.utils)
 
 ---@class Chat Accumulating chat history and usage
 ---@field client table

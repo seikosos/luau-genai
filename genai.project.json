@@ -1,6 +1,6 @@
 {
   "name": "NullFire-Genai",
   "tree": {
-    "$path": "src"
+    "$path": "src/"
   }
 }
