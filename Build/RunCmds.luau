@@ -21,7 +21,7 @@ print("Bundling genai...")
 local spawn1 = Run("lune", {
     "run", "Build", "bundle",
     "input=" .. projectFile,
-    "env-name=NF",
+    "env-name=genai",
     "output=onemodule.lua"
 }, false)
 

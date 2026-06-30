@@ -700,19 +700,26 @@ local ObjectTree = {
                 },
                 {
                     {
-                        6,
-                        2,
-                        {
-                            "anthropic"
-                        }
-                    },
-                    {
                         7,
                         2,
                         {
                             "openai"
                         }
+                    },
+                    {
+                        6,
+                        2,
+                        {
+                            "anthropic"
+                        }
                     }
+                }
+            },
+            {
+                4,
+                2,
+                {
+                    "genai"
                 }
             },
             {
@@ -729,13 +736,6 @@ local ObjectTree = {
                             "chat"
                         }
                     }
-                }
-            },
-            {
-                4,
-                2,
-                {
-                    "genai"
                 }
             }
         }
@@ -756,7 +756,7 @@ local LineOffsets = {
 
 -- Misc AOT variable imports
 local WaxVersion = "0.4.1"
-local EnvName = "NF"
+local EnvName = "genai"
 
 -- ++++++++ RUNTIME IMPL BELOW ++++++++ --
 
