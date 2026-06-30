@@ -1,7 +1,7 @@
 local cjson = game:GetService("HttpService")
-local utils = require("genai.utils")
-local providers = require("genai.providers")
-local features = require("genai.features")
+local utils = require("./utils")
+local providers = require("./providers")
+local features = require("./features")
 
 ---Client for interacting with specified API endpoint
 ---@class GenAI
