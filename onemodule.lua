@@ -168,8 +168,7 @@ function GenAI:call(opts)
 		self.provider.handle_exceptions
 	)
 
-	local reply, input_tokens, output_tokens =
-		self.provider.extract_response_data(accumulator and accumulator.schema or response)
+	local reply, input_tokens, output_tokens = self.provider.extract_response_data(response)
 	reply = type(reply) == "table" and cjson:JSONEncode(reply) or reply -- ensure json output is string
 
 	return reply, input_tokens, output_tokens
@@ -686,17 +685,33 @@ local ObjectTree = {
         },
         {
             {
-                8,
-                2,
-                {
-                    "utils"
-                }
-            },
-            {
                 4,
                 2,
                 {
                     "genai"
+                }
+            },
+            {
+                2,
+                2,
+                {
+                    "features"
+                },
+                {
+                    {
+                        3,
+                        2,
+                        {
+                            "chat"
+                        }
+                    }
+                }
+            },
+            {
+                8,
+                2,
+                {
+                    "utils"
                 }
             },
             {
@@ -721,22 +736,6 @@ local ObjectTree = {
                         }
                     }
                 }
-            },
-            {
-                2,
-                2,
-                {
-                    "features"
-                },
-                {
-                    {
-                        3,
-                        2,
-                        {
-                            "chat"
-                        }
-                    }
-                }
             }
         }
     }
@@ -748,10 +747,10 @@ local LineOffsets = {
     13,
     21,
     76,
-    191,
-    200,
-    367,
-    550
+    190,
+    199,
+    366,
+    549
 }
 
 -- Misc AOT variable imports

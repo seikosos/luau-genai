@@ -93,8 +93,7 @@ function GenAI:call(opts)
 		self.provider.handle_exceptions
 	)
 
-	local reply, input_tokens, output_tokens =
-		self.provider.extract_response_data(accumulator and accumulator.schema or response)
+	local reply, input_tokens, output_tokens = self.provider.extract_response_data(response)
 	reply = type(reply) == "table" and cjson:JSONEncode(reply) or reply -- ensure json output is string
 
 	return reply, input_tokens, output_tokens
