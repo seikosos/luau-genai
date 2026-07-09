@@ -1,4 +1,5 @@
 local cjson = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
 
 ---@module "genai.utils"
 local utils = {}
@@ -12,50 +13,58 @@ local utils = {}
 ---@param exception_handler function?
 ---@return string|table body
 function utils.send_request(url, payload, method, headers, callback, exception_handler)
-    local req = {
-        Url = url,
-        Method = method or "GET",
-        Headers = headers or {},
-        Body = payload
-    }
+	local success, response
+	local req = {
+		Url = url,
+		Method = method or "GET",
+		Headers = headers or {},
+		Body = payload
+	}
+	
+	if payload then
+		req.Headers["Content-Length"] = tostring(#payload)
+	end
+	
+	if RunService:IsStudio() then
+		success, response = pcall(function()
+			return cjson:RequestAsync(req)
+		end)
+	else
+		success, response = pcall(getgenv().request, req)
+	end
+	
+	if not success or not response then
+		if exception_handler then
+			return exception_handler(nil, 0)
+		else
+			error("Request failed: " .. tostring(response))
+		end
+	end
 
-    if payload then
-        req.Headers["Content-Length"] = tostring(#payload)
-    end
+	local body = response.Body or ""
+	local status_code = response.StatusCode or 0
+	local content_type = response.Headers and response.Headers["Content-Type"] or ""
 
-    local success, response = pcall(getgenv().request, req)
-    if not success then
-        if exception_handler then
-            return exception_handler(nil, 0)
-        else
-            error("Request failed: " .. tostring(response))
-        end
-    end
+	if callback then
+		callback(body)
+	end
 
-    local body = response.Body or ""
-    local status_code = response.StatusCode or 0
-    local content_type = response.Headers and response.Headers["Content-Type"] or ""
+	if content_type:find("application/json") then
+		local success, parsed = pcall(function() return game:GetService("HttpService"):JSONDecode(body) end)
+		if success then
+			body = parsed
+		else
+			warn("Failed to decode JSON response.")
+		end
+	end
 
-    if callback then
-        callback(body)
-    end
+	if exception_handler then
+		exception_handler(body, status_code)
+	else
+		assert(status_code == 200, body)
+	end
 
-    if content_type:find("application/json") then
-        local success, parsed = pcall(function() return game:GetService("HttpService"):JSONDecode(body) end)
-        if success then
-            body = parsed
-        else
-            warn("Failed to decode JSON response.")
-        end
-    end
-
-    if exception_handler then
-        exception_handler(body, status_code)
-    else
-        assert(status_code == 200, body)
-    end
-
-    return body
+	return body
 end
 
 ---Storage for full stream response
