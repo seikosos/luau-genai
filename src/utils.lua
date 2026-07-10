@@ -49,12 +49,10 @@ function utils.send_request(url, payload, method, headers, callback, exception_h
 		callback(body)
 	end
 
-	if content_type:find("application/json") then
+	if type(body) == "string" and body:sub(1, 1) == "{" or body:sub(1, 1) == "[" then
 		local success, parsed = pcall(function() return game:GetService("HttpService"):JSONDecode(body) end)
 		if success then
 			body = parsed
-		else
-			warn("Failed to decode JSON response.")
 		end
 	end
 

@@ -83,10 +83,11 @@ end
 ---@return number input_tokens
 ---@return number output_tokens
 function openai.extract_response_data(response)
-	if not response then return nil, nil, nil end
-	local reply = response.choices[1].message.content
-	local input_tokens = response.usage.prompt_tokens
-	local output_tokens = response.usage.completion_tokens
+	if not response or not response.choices or #response.choices == 0 then return nil, nil, nil end
+	local choice = table.remove(response.choices, 1)
+	local reply = choice.message.content
+	local input_tokens = response.usage and response.usage.prompt_tokens or 0
+	local output_tokens = response.usage and response.usage.completion_tokens or 0
 	return reply, input_tokens, output_tokens
 end
 
@@ -142,7 +143,7 @@ end
 ---@param response table
 ---@param status_code number
 function openai.handle_exceptions(response, status_code)
-	if status_code >= 300 then
+	if response and response.error and response.error.type and response.error.message then
 		local err_msg = string.format("%d %s: %s", status_code, response.error.type, response.error.message)
 		error(err_msg)
 	end

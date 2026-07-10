@@ -448,10 +448,11 @@ end
 ---@return number input_tokens
 ---@return number output_tokens
 function openai.extract_response_data(response)
-	if not response then return nil, nil, nil end
-	local reply = response.choices[1].message.content
-	local input_tokens = response.usage.prompt_tokens
-	local output_tokens = response.usage.completion_tokens
+	if not response or not response.choices or #response.choices == 0 then return nil, nil, nil end
+	local choice = table.remove(response.choices, 1)
+	local reply = choice.message.content
+	local input_tokens = response.usage and response.usage.prompt_tokens or 0
+	local output_tokens = response.usage and response.usage.completion_tokens or 0
 	return reply, input_tokens, output_tokens
 end
 
@@ -507,7 +508,7 @@ end
 ---@param response table
 ---@param status_code number
 function openai.handle_exceptions(response, status_code)
-	if status_code >= 300 then
+	if response and response.error and response.error.type and response.error.message then
 		local err_msg = string.format("%d %s: %s", status_code, response.error.type, response.error.message)
 		error(err_msg)
 	end
@@ -548,6 +549,7 @@ return openai
 
 end)() end,
     function()local wax,script,require=ImportGlobals(8)local ImportGlobals return (function(...)local cjson = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
 
 ---@module "genai.utils"
 local utils = {}
@@ -561,50 +563,56 @@ local utils = {}
 ---@param exception_handler function?
 ---@return string|table body
 function utils.send_request(url, payload, method, headers, callback, exception_handler)
-    local req = {
-        Url = url,
-        Method = method or "GET",
-        Headers = headers or {},
-        Body = payload
-    }
+	local success, response
+	local req = {
+		Url = url,
+		Method = method or "GET",
+		Headers = headers or {},
+		Body = payload
+	}
+	
+	if payload then
+		req.Headers["Content-Length"] = tostring(#payload)
+	end
+	
+	if RunService:IsStudio() then
+		success, response = pcall(function()
+			return cjson:RequestAsync(req)
+		end)
+	else
+		success, response = pcall(getgenv().request, req)
+	end
+	
+	if not success or not response then
+		if exception_handler then
+			return exception_handler(nil, 0)
+		else
+			error("Request failed: " .. tostring(response))
+		end
+	end
 
-    if payload then
-        req.Headers["Content-Length"] = tostring(#payload)
-    end
+	local body = response.Body or ""
+	local status_code = response.StatusCode or 0
+	local content_type = response.Headers and response.Headers["Content-Type"] or ""
 
-    local success, response = pcall(getgenv().request, req)
-    if not success then
-        if exception_handler then
-            return exception_handler(nil, 0)
-        else
-            error("Request failed: " .. tostring(response))
-        end
-    end
+	if callback then
+		callback(body)
+	end
 
-    local body = response.Body or ""
-    local status_code = response.StatusCode or 0
-    local content_type = response.Headers and response.Headers["Content-Type"] or ""
+	if type(body) == "string" and body:sub(1, 1) == "{" or body:sub(1, 1) == "[" then
+		local success, parsed = pcall(function() return game:GetService("HttpService"):JSONDecode(body) end)
+		if success then
+			body = parsed
+		end
+	end
 
-    if callback then
-        callback(body)
-    end
+	if exception_handler then
+		exception_handler(body, status_code)
+	else
+		assert(status_code == 200, body)
+	end
 
-    if content_type:find("application/json") then
-        local success, parsed = pcall(function() return game:GetService("HttpService"):JSONDecode(body) end)
-        if success then
-            body = parsed
-        else
-            warn("Failed to decode JSON response.")
-        end
-    end
-
-    if exception_handler then
-        exception_handler(body, status_code)
-    else
-        assert(status_code == 200, body)
-    end
-
-    return body
+	return body
 end
 
 ---Storage for full stream response
@@ -686,6 +694,13 @@ local ObjectTree = {
         },
         {
             {
+                8,
+                2,
+                {
+                    "utils"
+                }
+            },
+            {
                 2,
                 2,
                 {
@@ -730,13 +745,6 @@ local ObjectTree = {
                         }
                     }
                 }
-            },
-            {
-                8,
-                2,
-                {
-                    "utils"
-                }
             }
         }
     }
@@ -751,7 +759,7 @@ local LineOffsets = {
     190,
     199,
     366,
-    550
+    551
 }
 
 -- Misc AOT variable imports
