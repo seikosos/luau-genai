@@ -575,7 +575,7 @@ function utils.send_request(url, payload, method, headers, callback, exception_h
 		req.Headers["Content-Length"] = tostring(#payload)
 	end
 	
-	if RunService:IsStudio() then
+	if RunService:IsServer() then
 		success, response = pcall(function()
 			return cjson:RequestAsync(req)
 		end)
@@ -694,13 +694,6 @@ local ObjectTree = {
         },
         {
             {
-                8,
-                2,
-                {
-                    "utils"
-                }
-            },
-            {
                 5,
                 2,
                 {
@@ -708,26 +701,26 @@ local ObjectTree = {
                 },
                 {
                     {
-                        6,
-                        2,
-                        {
-                            "anthropic"
-                        }
-                    },
-                    {
                         7,
                         2,
                         {
                             "openai"
                         }
+                    },
+                    {
+                        6,
+                        2,
+                        {
+                            "anthropic"
+                        }
                     }
                 }
             },
             {
-                4,
+                8,
                 2,
                 {
-                    "genai"
+                    "utils"
                 }
             },
             {
@@ -744,6 +737,13 @@ local ObjectTree = {
                             "chat"
                         }
                     }
+                }
+            },
+            {
+                4,
+                2,
+                {
+                    "genai"
                 }
             }
         }

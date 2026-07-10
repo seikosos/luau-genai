@@ -25,7 +25,7 @@ function utils.send_request(url, payload, method, headers, callback, exception_h
 		req.Headers["Content-Length"] = tostring(#payload)
 	end
 	
-	if RunService:IsStudio() then
+	if RunService:IsServer() then
 		success, response = pcall(function()
 			return cjson:RequestAsync(req)
 		end)
