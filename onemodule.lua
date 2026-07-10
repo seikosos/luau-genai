@@ -448,6 +448,13 @@ end
 ---@return number input_tokens
 ---@return number output_tokens
 function openai.extract_response_data(response)
+	print(response)
+	for i,v in response do
+		print(i,v)
+	end
+	for i,v in response.choices do
+		print(i,v)
+	end
 	if not response or not response.choices then return "INVALID???", 0 , 0 end
 	for i,v in response.choices do
 		print(i,v)
@@ -711,26 +718,19 @@ local ObjectTree = {
                 },
                 {
                     {
-                        6,
-                        2,
-                        {
-                            "anthropic"
-                        }
-                    },
-                    {
                         7,
                         2,
                         {
                             "openai"
                         }
+                    },
+                    {
+                        6,
+                        2,
+                        {
+                            "anthropic"
+                        }
                     }
-                }
-            },
-            {
-                4,
-                2,
-                {
-                    "genai"
                 }
             },
             {
@@ -748,6 +748,13 @@ local ObjectTree = {
                         }
                     }
                 }
+            },
+            {
+                4,
+                2,
+                {
+                    "genai"
+                }
             }
         }
     }
@@ -762,7 +769,7 @@ local LineOffsets = {
     190,
     199,
     366,
-    554
+    561
 }
 
 -- Misc AOT variable imports

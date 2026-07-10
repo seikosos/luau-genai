@@ -83,6 +83,7 @@ end
 ---@return number input_tokens
 ---@return number output_tokens
 function openai.extract_response_data(response)
+	print(response)
 	for i,v in response do
 		print(i,v)
 	end
