@@ -448,17 +448,7 @@ end
 ---@return number input_tokens
 ---@return number output_tokens
 function openai.extract_response_data(response)
-	print(response)
-	for i,v in response do
-		print(i,v)
-	end
-	for i,v in response.choices do
-		print(i,v)
-	end
 	if not response or not response.choices then return "INVALID???", 0 , 0 end
-	for i,v in response.choices do
-		print(i,v)
-	end
 	local choice = response.choices[1]
 	local reply = choice and choice.message and choice.message.content or "INVALID RESPONSE"
 	local input_tokens = response.usage and response.usage.prompt_tokens or 0
@@ -609,7 +599,7 @@ function utils.send_request(url, payload, method, headers, callback, exception_h
 		callback(body)
 	end
 
-	if content_type:find("application/json") then
+	if content_type:find("application/json") or type(body) == "string" and body:sub(1, 1) == "{" or body:sub(1, 1) == "[" then
 		local success, parsed = pcall(function() return game:GetService("HttpService"):JSONDecode(body) end)
 		if success then
 			body = parsed
@@ -704,6 +694,13 @@ local ObjectTree = {
         },
         {
             {
+                8,
+                2,
+                {
+                    "utils"
+                }
+            },
+            {
                 5,
                 2,
                 {
@@ -711,19 +708,26 @@ local ObjectTree = {
                 },
                 {
                     {
-                        7,
-                        2,
-                        {
-                            "openai"
-                        }
-                    },
-                    {
                         6,
                         2,
                         {
                             "anthropic"
                         }
+                    },
+                    {
+                        7,
+                        2,
+                        {
+                            "openai"
+                        }
                     }
+                }
+            },
+            {
+                4,
+                2,
+                {
+                    "genai"
                 }
             },
             {
@@ -741,20 +745,6 @@ local ObjectTree = {
                         }
                     }
                 }
-            },
-            {
-                4,
-                2,
-                {
-                    "genai"
-                }
-            },
-            {
-                8,
-                2,
-                {
-                    "utils"
-                }
             }
         }
     }
@@ -769,7 +759,7 @@ local LineOffsets = {
     190,
     199,
     366,
-    561
+    551
 }
 
 -- Misc AOT variable imports
