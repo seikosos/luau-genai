@@ -83,6 +83,12 @@ end
 ---@return number input_tokens
 ---@return number output_tokens
 function openai.extract_response_data(response)
+	for i,v in response do
+		print(i,v)
+	end
+	for i,v in response.choices do
+		print(i,v)
+	end
 	if not response or not response.choices then return "INVALID???", 0 , 0 end
 	for i,v in response.choices do
 		print(i,v)
