@@ -101,22 +101,20 @@ end
 ---@param providers table Collection of GenAI provider modules
 ---@return table? provider_module Collection of functions determining input and output structure
 function GenAI:_determine_provider(providers)
-	local provider = nil
-	local endpoint = self._endpoint
-	for provider_name, provider_module in pairs(providers) do
-		if endpoint:find(provider_name) then provider = provider_module end
+	local prefix = self._endpoint:match("^(.-)::")
+	
+	if prefix and providers[prefix] then
+		self._endpoint:gsub(prefix.."::", "")
+		return providers[prefix]
 	end
-	assert(provider, "GenAI provider could not be determined from provided endpoint")
-	self._endpoint = self:check_if_openai_compatible(endpoint)
-	return provider
-end
 
----Check if the endpoint starts with 'openai::' for API compatibility
----@param endpoint string
----@return string endpoint
-function GenAI:check_if_openai_compatible(endpoint)
-	local prefix, url = endpoint:match("^(.-)::(.+)$")
-	return (prefix == "openai") and url or endpoint
+	for provider_name, provider_module in pairs(providers) do
+		if self._endpoint:find(provider_name) then
+			return provider_module
+		end
+	end
+
+	error("GenAI provider could not be determined from provided endpoint")
 end
 
 ---Prepare streaming requirements if set to stream
@@ -694,6 +692,36 @@ local ObjectTree = {
         },
         {
             {
+                8,
+                2,
+                {
+                    "utils"
+                }
+            },
+            {
+                4,
+                2,
+                {
+                    "genai"
+                }
+            },
+            {
+                2,
+                2,
+                {
+                    "features"
+                },
+                {
+                    {
+                        3,
+                        2,
+                        {
+                            "chat"
+                        }
+                    }
+                }
+            },
+            {
                 5,
                 2,
                 {
@@ -715,36 +743,6 @@ local ObjectTree = {
                         }
                     }
                 }
-            },
-            {
-                8,
-                2,
-                {
-                    "utils"
-                }
-            },
-            {
-                2,
-                2,
-                {
-                    "features"
-                },
-                {
-                    {
-                        3,
-                        2,
-                        {
-                            "chat"
-                        }
-                    }
-                }
-            },
-            {
-                4,
-                2,
-                {
-                    "genai"
-                }
             }
         }
     }
@@ -756,10 +754,10 @@ local LineOffsets = {
     13,
     21,
     76,
-    190,
-    199,
-    366,
-    551
+    188,
+    197,
+    364,
+    549
 }
 
 -- Misc AOT variable imports

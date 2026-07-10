@@ -27,8 +27,9 @@ end
 ---@return table? provider_module Collection of functions determining input and output structure
 function GenAI:_determine_provider(providers)
 	local prefix = self._endpoint:match("^(.-)::")
-
+	
 	if prefix and providers[prefix] then
+		self._endpoint:gsub(prefix.."::", "")
 		return providers[prefix]
 	end
 
