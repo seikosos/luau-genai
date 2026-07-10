@@ -32,7 +32,7 @@ function utils.send_request(url, payload, method, headers, callback, exception_h
 	else
 		success, response = pcall(getgenv().request, req)
 	end
-	
+	print(success, response.StatusCode)
 	if not success or not response then
 		if exception_handler then
 			return exception_handler(nil, 0)
@@ -49,7 +49,7 @@ function utils.send_request(url, payload, method, headers, callback, exception_h
 		callback(body)
 	end
 
-	if type(body) == "string" and body:sub(1, 1) == "{" or body:sub(1, 1) == "[" then
+	if content_type:find("application/json") then
 		local success, parsed = pcall(function() return game:GetService("HttpService"):JSONDecode(body) end)
 		if success then
 			body = parsed

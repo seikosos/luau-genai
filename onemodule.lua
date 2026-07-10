@@ -518,7 +518,7 @@ end
 ---@param response table
 ---@param status_code number
 function openai.handle_exceptions(response, status_code)
-	if response and response.error and response.error.type and response.error.message then
+	if response and response.error and response.error.type and response.error.message or status_code > 200 then
 		local err_msg = string.format("%d %s: %s", status_code, response.error.type, response.error.message)
 		error(err_msg)
 	end
@@ -592,7 +592,7 @@ function utils.send_request(url, payload, method, headers, callback, exception_h
 	else
 		success, response = pcall(getgenv().request, req)
 	end
-	
+	print(success, response.StatusCode)
 	if not success or not response then
 		if exception_handler then
 			return exception_handler(nil, 0)
@@ -609,7 +609,7 @@ function utils.send_request(url, payload, method, headers, callback, exception_h
 		callback(body)
 	end
 
-	if type(body) == "string" and body:sub(1, 1) == "{" or body:sub(1, 1) == "[" then
+	if content_type:find("application/json") then
 		local success, parsed = pcall(function() return game:GetService("HttpService"):JSONDecode(body) end)
 		if success then
 			body = parsed
@@ -718,19 +718,26 @@ local ObjectTree = {
                 },
                 {
                     {
-                        7,
-                        2,
-                        {
-                            "openai"
-                        }
-                    },
-                    {
                         6,
                         2,
                         {
                             "anthropic"
                         }
+                    },
+                    {
+                        7,
+                        2,
+                        {
+                            "openai"
+                        }
                     }
+                }
+            },
+            {
+                4,
+                2,
+                {
+                    "genai"
                 }
             },
             {
@@ -747,13 +754,6 @@ local ObjectTree = {
                             "chat"
                         }
                     }
-                }
-            },
-            {
-                4,
-                2,
-                {
-                    "genai"
                 }
             }
         }

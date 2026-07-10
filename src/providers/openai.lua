@@ -153,7 +153,7 @@ end
 ---@param response table
 ---@param status_code number
 function openai.handle_exceptions(response, status_code)
-	if response and response.error and response.error.type and response.error.message then
+	if response and response.error and response.error.type and response.error.message or status_code > 200 then
 		local err_msg = string.format("%d %s: %s", status_code, response.error.type, response.error.message)
 		error(err_msg)
 	end
