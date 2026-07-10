@@ -448,7 +448,6 @@ end
 ---@return number input_tokens
 ---@return number output_tokens
 function openai.extract_response_data(response)
-	if not response or not response.choices or #response.choices == 0 then return nil, nil, nil end
 	local choice = table.remove(response.choices, 1)
 	local reply = choice.message.content
 	local input_tokens = response.usage and response.usage.prompt_tokens or 0
@@ -694,33 +693,17 @@ local ObjectTree = {
         },
         {
             {
-                4,
-                2,
-                {
-                    "genai"
-                }
-            },
-            {
-                2,
-                2,
-                {
-                    "features"
-                },
-                {
-                    {
-                        3,
-                        2,
-                        {
-                            "chat"
-                        }
-                    }
-                }
-            },
-            {
                 8,
                 2,
                 {
                     "utils"
+                }
+            },
+            {
+                4,
+                2,
+                {
+                    "genai"
                 }
             },
             {
@@ -745,6 +728,22 @@ local ObjectTree = {
                         }
                     }
                 }
+            },
+            {
+                2,
+                2,
+                {
+                    "features"
+                },
+                {
+                    {
+                        3,
+                        2,
+                        {
+                            "chat"
+                        }
+                    }
+                }
             }
         }
     }
@@ -759,7 +758,7 @@ local LineOffsets = {
     190,
     199,
     366,
-    551
+    550
 }
 
 -- Misc AOT variable imports

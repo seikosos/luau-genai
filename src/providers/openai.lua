@@ -83,7 +83,6 @@ end
 ---@return number input_tokens
 ---@return number output_tokens
 function openai.extract_response_data(response)
-	if not response or not response.choices or #response.choices == 0 then return nil, nil, nil end
 	local choice = table.remove(response.choices, 1)
 	local reply = choice.message.content
 	local input_tokens = response.usage and response.usage.prompt_tokens or 0
