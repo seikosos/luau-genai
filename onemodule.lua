@@ -704,13 +704,6 @@ local ObjectTree = {
         },
         {
             {
-                8,
-                2,
-                {
-                    "utils"
-                }
-            },
-            {
                 5,
                 2,
                 {
@@ -718,26 +711,19 @@ local ObjectTree = {
                 },
                 {
                     {
-                        6,
-                        2,
-                        {
-                            "anthropic"
-                        }
-                    },
-                    {
                         7,
                         2,
                         {
                             "openai"
                         }
+                    },
+                    {
+                        6,
+                        2,
+                        {
+                            "anthropic"
+                        }
                     }
-                }
-            },
-            {
-                4,
-                2,
-                {
-                    "genai"
                 }
             },
             {
@@ -754,6 +740,20 @@ local ObjectTree = {
                             "chat"
                         }
                     }
+                }
+            },
+            {
+                4,
+                2,
+                {
+                    "genai"
+                }
+            },
+            {
+                8,
+                2,
+                {
+                    "utils"
                 }
             }
         }
