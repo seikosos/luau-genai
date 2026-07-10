@@ -449,7 +449,7 @@ end
 ---@return number output_tokens
 function openai.extract_response_data(response)
 	local choice = table.remove(response.choices, 1)
-	local reply = choice.message.content
+	local reply = choice and choice.message and choice.message.content or "INVALID RESPONSE"
 	local input_tokens = response.usage and response.usage.prompt_tokens or 0
 	local output_tokens = response.usage and response.usage.completion_tokens or 0
 	return reply, input_tokens, output_tokens
@@ -693,13 +693,6 @@ local ObjectTree = {
         },
         {
             {
-                8,
-                2,
-                {
-                    "utils"
-                }
-            },
-            {
                 4,
                 2,
                 {
@@ -707,26 +700,10 @@ local ObjectTree = {
                 }
             },
             {
-                5,
+                8,
                 2,
                 {
-                    "providers"
-                },
-                {
-                    {
-                        7,
-                        2,
-                        {
-                            "openai"
-                        }
-                    },
-                    {
-                        6,
-                        2,
-                        {
-                            "anthropic"
-                        }
-                    }
+                    "utils"
                 }
             },
             {
@@ -741,6 +718,29 @@ local ObjectTree = {
                         2,
                         {
                             "chat"
+                        }
+                    }
+                }
+            },
+            {
+                5,
+                2,
+                {
+                    "providers"
+                },
+                {
+                    {
+                        6,
+                        2,
+                        {
+                            "anthropic"
+                        }
+                    },
+                    {
+                        7,
+                        2,
+                        {
+                            "openai"
                         }
                     }
                 }

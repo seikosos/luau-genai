@@ -84,7 +84,7 @@ end
 ---@return number output_tokens
 function openai.extract_response_data(response)
 	local choice = table.remove(response.choices, 1)
-	local reply = choice.message.content
+	local reply = choice and choice.message and choice.message.content or "INVALID RESPONSE"
 	local input_tokens = response.usage and response.usage.prompt_tokens or 0
 	local output_tokens = response.usage and response.usage.completion_tokens or 0
 	return reply, input_tokens, output_tokens
