@@ -449,7 +449,10 @@ end
 ---@return number output_tokens
 function openai.extract_response_data(response)
 	if not response or not response.choices then return "INVALID???", 0 , 0 end
-	local choice = table.remove(response.choices, 1)
+	for i,v in response.choices do
+		print(i,v)
+	end
+	local choice = response.choices[1]
 	local reply = choice and choice.message and choice.message.content or "INVALID RESPONSE"
 	local input_tokens = response.usage and response.usage.prompt_tokens or 0
 	local output_tokens = response.usage and response.usage.completion_tokens or 0
@@ -694,6 +697,43 @@ local ObjectTree = {
         },
         {
             {
+                8,
+                2,
+                {
+                    "utils"
+                }
+            },
+            {
+                5,
+                2,
+                {
+                    "providers"
+                },
+                {
+                    {
+                        6,
+                        2,
+                        {
+                            "anthropic"
+                        }
+                    },
+                    {
+                        7,
+                        2,
+                        {
+                            "openai"
+                        }
+                    }
+                }
+            },
+            {
+                4,
+                2,
+                {
+                    "genai"
+                }
+            },
+            {
                 2,
                 2,
                 {
@@ -705,43 +745,6 @@ local ObjectTree = {
                         2,
                         {
                             "chat"
-                        }
-                    }
-                }
-            },
-            {
-                8,
-                2,
-                {
-                    "utils"
-                }
-            },
-            {
-                4,
-                2,
-                {
-                    "genai"
-                }
-            },
-            {
-                5,
-                2,
-                {
-                    "providers"
-                },
-                {
-                    {
-                        7,
-                        2,
-                        {
-                            "openai"
-                        }
-                    },
-                    {
-                        6,
-                        2,
-                        {
-                            "anthropic"
                         }
                     }
                 }
@@ -759,7 +762,7 @@ local LineOffsets = {
     190,
     199,
     366,
-    551
+    554
 }
 
 -- Misc AOT variable imports

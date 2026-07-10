@@ -84,7 +84,10 @@ end
 ---@return number output_tokens
 function openai.extract_response_data(response)
 	if not response or not response.choices then return "INVALID???", 0 , 0 end
-	local choice = table.remove(response.choices, 1)
+	for i,v in response.choices do
+		print(i,v)
+	end
+	local choice = response.choices[1]
 	local reply = choice and choice.message and choice.message.content or "INVALID RESPONSE"
 	local input_tokens = response.usage and response.usage.prompt_tokens or 0
 	local output_tokens = response.usage and response.usage.completion_tokens or 0
