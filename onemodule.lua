@@ -59,8 +59,8 @@ function Chat:say(user_prompt)
 	table.insert(self.history, self.client.provider.construct_user_message(user_prompt))
 	local reply, input_tokens, output_tokens = self.client:call(self)
 	table.insert(self.history, self.client.provider.construct_assistant_message(reply))
-	self.usage.input = self.usage.input + input_tokens
-	self.usage.output = self.usage.output + output_tokens
+	self.usage.input = self.usage.input + (input_tokens or 0)
+	self.usage.output = self.usage.output + (input_tokens or 0)
 	return reply
 end
 
@@ -701,6 +701,29 @@ local ObjectTree = {
                 }
             },
             {
+                5,
+                2,
+                {
+                    "providers"
+                },
+                {
+                    {
+                        7,
+                        2,
+                        {
+                            "openai"
+                        }
+                    },
+                    {
+                        6,
+                        2,
+                        {
+                            "anthropic"
+                        }
+                    }
+                }
+            },
+            {
                 2,
                 2,
                 {
@@ -721,29 +744,6 @@ local ObjectTree = {
                 2,
                 {
                     "genai"
-                }
-            },
-            {
-                5,
-                2,
-                {
-                    "providers"
-                },
-                {
-                    {
-                        6,
-                        2,
-                        {
-                            "anthropic"
-                        }
-                    },
-                    {
-                        7,
-                        2,
-                        {
-                            "openai"
-                        }
-                    }
                 }
             }
         }
