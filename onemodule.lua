@@ -101,20 +101,22 @@ end
 ---@param providers table Collection of GenAI provider modules
 ---@return table? provider_module Collection of functions determining input and output structure
 function GenAI:_determine_provider(providers)
-	local prefix = self._endpoint:match("^(.-)::")
-	
-	if prefix and providers[prefix] then
-		self._endpoint:gsub(prefix.."::", "")
-		return providers[prefix]
-	end
-
+	local provider = nil
+	local endpoint = self._endpoint
 	for provider_name, provider_module in pairs(providers) do
-		if self._endpoint:find(provider_name) then
-			return provider_module
-		end
+		if endpoint:find(provider_name) then provider = provider_module end
 	end
+	assert(provider, "GenAI provider could not be determined from provided endpoint")
+	self._endpoint = self:check_if_openai_compatible(endpoint)
+	return provider
+end
 
-	error("GenAI provider could not be determined from provided endpoint")
+---Check if the endpoint starts with 'openai::' for API compatibility
+---@param endpoint string
+---@return string endpoint
+function GenAI:check_if_openai_compatible(endpoint)
+	local prefix, url = endpoint:match("^(.-)::(.+)$")
+	return (prefix == "openai") and url or endpoint
 end
 
 ---Prepare streaming requirements if set to stream
@@ -446,7 +448,7 @@ end
 ---@return number input_tokens
 ---@return number output_tokens
 function openai.extract_response_data(response)
-	if not response or not response.choices then return "INVALID???", 0 , 0 end
+	if not response or not response.choices then return "INVALID???", 0, 0 end
 	local choice = response.choices[1]
 	local reply = choice and choice.message and choice.message.content or "INVALID RESPONSE"
 	local input_tokens = response.usage and response.usage.prompt_tokens or 0
@@ -580,7 +582,7 @@ function utils.send_request(url, payload, method, headers, callback, exception_h
 	else
 		success, response = pcall(getgenv().request, req)
 	end
-	print(success, response.StatusCode)
+	print(success, response, response.StatusCode)
 	if not success or not response then
 		if exception_handler then
 			return exception_handler(nil, 0)
@@ -692,33 +694,10 @@ local ObjectTree = {
         },
         {
             {
-                8,
-                2,
-                {
-                    "utils"
-                }
-            },
-            {
                 4,
                 2,
                 {
                     "genai"
-                }
-            },
-            {
-                2,
-                2,
-                {
-                    "features"
-                },
-                {
-                    {
-                        3,
-                        2,
-                        {
-                            "chat"
-                        }
-                    }
                 }
             },
             {
@@ -743,6 +722,29 @@ local ObjectTree = {
                         }
                     }
                 }
+            },
+            {
+                2,
+                2,
+                {
+                    "features"
+                },
+                {
+                    {
+                        3,
+                        2,
+                        {
+                            "chat"
+                        }
+                    }
+                }
+            },
+            {
+                8,
+                2,
+                {
+                    "utils"
+                }
             }
         }
     }
@@ -754,10 +756,10 @@ local LineOffsets = {
     13,
     21,
     76,
-    188,
-    197,
-    364,
-    549
+    190,
+    199,
+    366,
+    551
 }
 
 -- Misc AOT variable imports
